@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:deal_connect_flutter/pages/Verification/forgot_password_screen.dart';
 import 'package:deal_connect_flutter/pages/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../components/custom_text_fild.dart';
@@ -92,7 +93,9 @@ class SignInScreen extends StatelessWidget {
                           repeatForever: true,
                           animatedTexts: [
                             FadeAnimatedText('Menu do RU'),
-                            FadeAnimatedText('Alimentos',),
+                            FadeAnimatedText(
+                              'Alimentos',
+                            ),
                             FadeAnimatedText('Bebidas'),
                             FadeAnimatedText('Produtos orgânicos'),
                             FadeAnimatedText('Artesanato e Acessórios'),
@@ -154,7 +157,15 @@ class SignInScreen extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (c) {
+                                return ForgotPasswordScreen();
+                              },
+                            ),
+                          );
+                        },
                         child: const Text(
                           'Esqueceu a senha?',
                           style: TextStyle(color: Colors.black54),

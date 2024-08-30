@@ -1,21 +1,30 @@
+import 'package:deal_connect_flutter/pages/Verification/verify_code_screen.dart';
 import 'package:deal_connect_flutter/service/consumer_api_creat.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../components/custom_text_fild.dart';
 import '../../config/custom_colors.dart';
-import 'sign_in_screen.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
+
+  @override
+  _SignUpScreenState createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final usernameController = TextEditingController();
   final phoneController = TextEditingController();
 
   final phoneFormatter = MaskTextInputFormatter(
-    mask: '## (##) #####-####',
+    mask: '+55 (##) #####-####',
     filter: {'#': RegExp(r'[0-9]')},
   );
 
@@ -26,13 +35,7 @@ class SignUpScreen extends StatelessWidget {
     final username = usernameController.text.trim();
     final phone = phoneController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || username.isEmpty || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, preencha todos os campos'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -45,17 +48,11 @@ class SignUpScreen extends StatelessWidget {
         phone: phone,
       );
 
-      // Usuário cadastrado com sucesso, mostra a mensagem e navega para a tela de login.
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Usuário cadastrado com sucesso'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email);
 
-      // Navega para a tela de login
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => SignInScreen()),
+        MaterialPageRoute(builder: (context) => VerifyCodeScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,8 +90,6 @@ class SignUpScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // Formulário
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
@@ -102,62 +97,111 @@ class SignUpScreen extends StatelessWidget {
                     ),
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(45)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(45)),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        CustomTextFild(
-                          icon: Icons.person,
-                          label: 'Nome',
-                          customcontroller: nameController,
-                        ),
-                        CustomTextFild(
-                          icon: Icons.email,
-                          label: 'Email',
-                          customcontroller: emailController,
-                        ),
-                        CustomTextFild(
-                          icon: Icons.lock,
-                          label: 'Senha',
-                          isSecret: true,
-                          customcontroller: passwordController,
-                        ),
-                        CustomTextFild(
-                          icon: Icons.person,
-                          label: 'Apelido',
-                          customcontroller: usernameController,
-                        ),
-                        CustomTextFild(
-                          icon: Icons.phone,
-                          label: 'Celular',
-                          inputFormatters: [phoneFormatter],
-                          customcontroller: phoneController,
-                        ),
-
-                        // Botão Cadastrar
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: CustomColors.customSwatchColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            onPressed: () async {
-                              await _registerUser(context);
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          CustomTextFild(
+                            icon: Icons.person,
+                            label: 'Nome',
+                            customcontroller: nameController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, insira o nome';
+                              }
+                              return null;
                             },
-                            child: const Text(
-                              'Cadastrar usuário',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
+                          ),
+                          CustomTextFild(
+                            icon: Icons.email,
+                            label: 'Email',
+                            customcontroller: emailController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, insira o email';
+                              }
+                              return null;
+                            },
+                          ),
+                          CustomTextFild(
+                            icon: Icons.lock,
+                            label: 'Senha',
+                            isSecret: true,
+                            customcontroller: passwordController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, insira a senha';
+                              }
+                              return null;
+                            },
+                          ),
+                          CustomTextFild(
+                            icon: Icons.lock,
+                            label: 'Confirme a Senha',
+                            isSecret: true,
+                            customcontroller: confirmPasswordController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, confirme a senha';
+                              }
+                              if (value != passwordController.text) {
+                                return 'As senhas não coincidem';
+                              }
+                              return null;
+                            },
+                          ),
+                          CustomTextFild(
+                            icon: Icons.person,
+                            label: 'Apelido',
+                            customcontroller: usernameController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, insira o apelido';
+                              }
+                              return null;
+                            },
+                          ),
+                          CustomTextFild(
+                            icon: Icons.phone,
+                            label: 'Celular',
+                            inputFormatters: [phoneFormatter],
+                            customcontroller: phoneController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, insira o celular';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          // Botão Cadastrar
+                          SizedBox(
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: CustomColors.customSwatchColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                              ),
+                              onPressed: () async {
+                                await _registerUser(context);
+                              },
+                              child: const Text(
+                                'Cadastrar usuário',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

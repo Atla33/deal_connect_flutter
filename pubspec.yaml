@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: '>=3.2.1 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -32,11 +32,15 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.3.3
-  url_launcher: ^6.1.14
+  url_launcher: ^6.2.6
   shared_preferences: ^2.2.2
   flutter_secure_storage: ^9.0.0
   badges: ^3.1.2
-  
+  avatar_glow: ^2.0.1
+  bcrypt: ^1.1.3
+  image_picker: ^0.8.4+4
+  flutter_image_compress: ^1.1.0
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -45,6 +49,10 @@ dependencies:
   animated_text_kit: ^4.2.2
   mask_text_input_formatter: ^2.5.0
   intl: ^0.18.1
+  path: ^1.9.0
+  connectivity_plus: ^2.0.2
+  pin_code_fields: ^8.0.1
+  flutter_masked_text2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
@@ -69,8 +77,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/dealconnect_logo.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
